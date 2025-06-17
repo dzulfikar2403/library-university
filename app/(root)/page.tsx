@@ -1,8 +1,6 @@
 import BookList from "@/components/BookList";
 import BookOverview from "@/components/BookOverview";
-import { Button } from "@/components/ui/button";
 import { sampleBooks } from "@/constant";
-import Image from "next/image";
 
 const Home = () =>  {
   

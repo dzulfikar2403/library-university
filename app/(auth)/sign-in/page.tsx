@@ -12,7 +12,7 @@ const page = () => {
         email: "",
         password: ""
        }}
-      onSubmit={() => {}}
+      onSubmit={(data: TSignInSchema) => console.log(data)}
     />
   )
 }

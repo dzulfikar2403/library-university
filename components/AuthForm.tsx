@@ -25,7 +25,7 @@ import Link from "next/link";
 import { FIELD_NAMES, FIELD_TYPES } from "@/constant";
 import ImageInput from "./ImageInput";
 
-type AuthFormProps<T> = {
+type AuthFormProps<T extends FieldValues> = {
   type: "sign-in" | "sign-up";
   schema: ZodType<T>;
   defaultValue: T;
@@ -71,7 +71,7 @@ const AuthForm = <T extends FieldValues>({
                   </FormLabel>
                   <FormControl>
                     {field.name === "universityCard" ? (
-                      <ImageInput />
+                      <ImageInput nameId={field.name} tipe="user" onChange={field.onChange} />
                     ) : (
                       <Input
                         required
