@@ -2,7 +2,8 @@
 import { uploadImages } from "@/lib/cloudinary";
 import Image from "next/image";
 import pLimit from "p-limit";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
+import { toast } from "sonner";
 
 type TFiles = {
   filePath: string;
@@ -22,7 +23,7 @@ const ImageInput = ({ nameId, tipe, onChange }: ImageInputProps) => {
   const handleInput = async (e: any) => {
     const images = [...e.target.files]; // spread ke array, agar bisa dimap nntinya.
     setFiles([]); // reset ulang setiap kali func jalan
-
+    
     if (!images) {
       return;
     }
@@ -48,9 +49,21 @@ const ImageInput = ({ nameId, tipe, onChange }: ImageInputProps) => {
       );
     });
 
-    const resultUrlUpload:string[] = await Promise.all(urlToCloudinary);
+    const resultUrlUpload: string[] = await Promise.all(urlToCloudinary);
     setFiles(resultUrlUpload); // setfiles hanya untuk show di UI
     onChange(resultUrlUpload[0]); // onchange dari react-hook-form
+
+    if (resultUrlUpload.length > 0) {
+      toast.success("Image was Successfully Upload!", {
+        duration: 3000,
+        closeButton: true,
+      });
+    } else {
+      toast.error("University Card ID is Mandatory registered system",{
+        duration: 3000,
+        closeButton: true,
+      });
+    }
   };
 
   return (
