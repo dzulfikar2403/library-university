@@ -1,4 +1,5 @@
 "use client";
+import { register } from "@/action/auth";
 import AuthForm from "@/components/AuthForm";
 import { signUpSchema, TSignUpSchema } from "@/lib/validations";
 
@@ -15,7 +16,7 @@ const page = () => {
         universityId: 0,
         universityCard: "",
       }}
-      onSubmit={(data: TSignUpSchema) => console.log(data)}
+      onSubmit={register}
     />
   );
 };

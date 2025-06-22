@@ -3,7 +3,6 @@ import BookOverview from "@/components/BookOverview";
 import { sampleBooks } from "@/constant";
 
 const Home = () =>  {
-  
   return (
     <>
       <BookOverview bookHero={sampleBooks[0]}  />

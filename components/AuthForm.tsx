@@ -1,20 +1,19 @@
 "use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import {
-  Controller,
   DefaultValues,
   FieldValues,
   Path,
   useForm,
 } from "react-hook-form";
-import { z, ZodType } from "zod";
+import { ZodTypeAny } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,12 +23,14 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { FIELD_NAMES, FIELD_TYPES } from "@/constant";
 import ImageInput from "./ImageInput";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 type AuthFormProps<T extends FieldValues> = {
   type: "sign-in" | "sign-up";
-  schema: ZodType<T>;
+  schema: ZodTypeAny;
   defaultValue: T;
-  onSubmit: (data: T) => void;
+  onSubmit: (data: T) => Promise<{success:boolean, message:string}>;
 };
 
 const AuthForm = <T extends FieldValues>({
@@ -39,11 +40,27 @@ const AuthForm = <T extends FieldValues>({
   onSubmit,
 }: AuthFormProps<T>) => {
   const isSignIn = type === "sign-in";
+  const router = useRouter();
 
   const form = useForm<T>({
     resolver: zodResolver(schema),
     defaultValues: defaultValue as DefaultValues<T>,
   });
+
+  const handleSubmit = async (data:T) => {
+    const response = await onSubmit(data);
+    form.reset();
+
+    if(response.success && isSignIn){ // cek jika success & signin
+      toast.success(response.message)
+      router.push('/')
+    }else if(response.success && !isSignIn){ // cek jika success & signup
+      toast.success(response.message)
+      router.push('/sign-in')
+    }else{
+      toast.error(response.message)
+    }
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -58,7 +75,7 @@ const AuthForm = <T extends FieldValues>({
           : "Please complete all fields and upload a valid university ID to gain access to the library"}
       </p>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           {Object.keys(defaultValue).map((eachField) => (
             <FormField
               key={eachField}
@@ -71,7 +88,7 @@ const AuthForm = <T extends FieldValues>({
                   </FormLabel>
                   <FormControl>
                     {field.name === "universityCard" ? (
-                      <ImageInput nameId={field.name} tipe="user" onChange={field.onChange} />
+                      <ImageInput nameId={field.name} tipe="user" onChange={field.onChange}/>
                     ) : (
                       <Input
                         required

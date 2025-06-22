@@ -6,7 +6,11 @@ const config = {
             apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
             secretKey: process.env.CLOUDINARY_API_SECRET
         },
-        databaseUrl: process.env.DATABASE_URL
+        databaseUrl: process.env.DATABASE_URL,
+        upstash: {
+            redisUrl: process.env.UPSTASH_REDIS_URL,
+            redisToken: process.env.UPSTASH_REDIS_TOKEN,
+        }
     }
 }
 

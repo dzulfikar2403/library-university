@@ -50,8 +50,10 @@ const ImageInput = ({ nameId, tipe, onChange }: ImageInputProps) => {
     });
 
     const resultUrlUpload: string[] = await Promise.all(urlToCloudinary);
-    setFiles(resultUrlUpload); // setfiles hanya untuk show di UI
+    
+    setFiles(resultUrlUpload); // setfiles hanya untuk show di UI, berdasarkan imageurl
     onChange(resultUrlUpload[0]); // onchange dari react-hook-form
+
 
     if (resultUrlUpload.length > 0) {
       toast.success("Image was Successfully Upload!", {

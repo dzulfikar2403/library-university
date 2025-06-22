@@ -1,4 +1,5 @@
 "use client"
+import { loginCredentials } from '@/action/auth'
 import AuthForm from '@/components/AuthForm'
 import { signInSchema, TSignInSchema } from '@/lib/validations'
 import React from 'react'
@@ -12,7 +13,7 @@ const page = () => {
         email: "",
         password: ""
        }}
-      onSubmit={(data: TSignInSchema) => console.log(data)}
+      onSubmit={loginCredentials}
     />
   )
 }
