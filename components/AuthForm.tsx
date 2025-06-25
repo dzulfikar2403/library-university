@@ -49,7 +49,6 @@ const AuthForm = <T extends FieldValues>({
 
   const handleSubmit = async (data:T) => {
     const response = await onSubmit(data);
-    form.reset();
 
     if(response.success && isSignIn){ // cek jika success & signin
       toast.success(response.message)

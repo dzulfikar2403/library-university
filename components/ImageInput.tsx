@@ -1,5 +1,6 @@
 "use client";
 import { uploadImages } from "@/lib/cloudinary";
+import { LoaderCircle } from "lucide-react";
 import Image from "next/image";
 import pLimit from "p-limit";
 import React, { useRef, useState } from "react";
@@ -19,12 +20,15 @@ type ImageInputProps = {
 const ImageInput = ({ nameId, tipe, onChange }: ImageInputProps) => {
   const inputRef = useRef<null | HTMLInputElement>(null);
   const [files, setFiles] = useState<string[]>([]);
+  const [isLoadingUpload, setIsLoadingUpload] = useState(false);
 
   const handleInput = async (e: any) => {
     const images = [...e.target.files]; // spread ke array, agar bisa dimap nntinya.
     setFiles([]); // reset ulang setiap kali func jalan
-    
+    setIsLoadingUpload(true); // load ui
+
     if (!images) {
+      setIsLoadingUpload(false);
       return;
     }
 
@@ -50,10 +54,12 @@ const ImageInput = ({ nameId, tipe, onChange }: ImageInputProps) => {
     });
 
     const resultUrlUpload: string[] = await Promise.all(urlToCloudinary);
-    
-    setFiles(resultUrlUpload); // setfiles hanya untuk show di UI, berdasarkan imageurl
-    onChange(resultUrlUpload[0]); // onchange dari react-hook-form
 
+    if (resultUrlUpload.length > 0) {
+      setFiles(resultUrlUpload); // setfiles hanya untuk show di UI, berdasarkan imageurl
+      onChange(resultUrlUpload[0]); // onchange dari react-hook-form
+      setIsLoadingUpload(false); // udahan loadnya
+    }
 
     if (resultUrlUpload.length > 0) {
       toast.success("Image was Successfully Upload!", {
@@ -61,7 +67,7 @@ const ImageInput = ({ nameId, tipe, onChange }: ImageInputProps) => {
         closeButton: true,
       });
     } else {
-      toast.error("University Card ID is Mandatory registered system",{
+      toast.error("University Card ID is Mandatory registered system", {
         duration: 3000,
         closeButton: true,
       });
@@ -78,6 +84,12 @@ const ImageInput = ({ nameId, tipe, onChange }: ImageInputProps) => {
         className="hidden"
         onChange={handleInput}
       />
+      {isLoadingUpload && (
+        <div className="flex justify-center flex-col items-center w-full py-10">
+          <LoaderCircle size={44} className="animate-spin" />
+          <p className="text-xs my-2">Uploading...</p>
+        </div>
+      )}
       <button
         className="upload-btn bg-dark-300"
         onClick={(e) => {
@@ -97,7 +109,6 @@ const ImageInput = ({ nameId, tipe, onChange }: ImageInputProps) => {
         />
         <p className="text-light-100">Upload a Card </p>
       </button>
-
       {files.length > 0 &&
         files.map((url: string, i) => (
           <Image

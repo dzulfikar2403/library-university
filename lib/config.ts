@@ -10,6 +10,9 @@ const config = {
         upstash: {
             redisUrl: process.env.UPSTASH_REDIS_URL,
             redisToken: process.env.UPSTASH_REDIS_TOKEN,
+        },
+        resend: {
+            ApiKey: process.env.RESEND_API_KEY
         }
     }
 }

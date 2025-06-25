@@ -13,7 +13,7 @@ const page = () => {
         email: "",
         password: ""
        }}
-      onSubmit={loginCredentials}
+      onSubmit={async (data) => await loginCredentials(data)}
     />
   )
 }

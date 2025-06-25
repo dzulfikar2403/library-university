@@ -16,7 +16,7 @@ const page = () => {
         universityId: 0,
         universityCard: "",
       }}
-      onSubmit={register}
+      onSubmit={async (data) => await register(data)}
     />
   );
 };
