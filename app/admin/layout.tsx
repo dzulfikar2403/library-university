@@ -9,7 +9,7 @@ import Header from "@/components/admin/Header";
 
 const layout = async ({ children }: { children: ReactNode }) => {
   const session = await auth();
-
+  
   if(!session?.user?.email) redirect('/sign-in') 
 
   return (
