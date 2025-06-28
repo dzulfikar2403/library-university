@@ -10,7 +10,8 @@ import Header from "@/components/admin/Header";
 const layout = async ({ children }: { children: ReactNode }) => {
   const session = await auth();
   
-  if(!session?.user?.email) redirect('/sign-in') 
+  if(!session?.user?.email) redirect('/sign-in');
+  // if(session.user.role !== 'admin') redirect('/');
 
   return (
     <div className="flex min-h-screen w-full flex-row">

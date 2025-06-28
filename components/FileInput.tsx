@@ -51,10 +51,16 @@ const FileInput = ({
 
     if (!filesArr || filesArr.length === 0) {
       setIsLoadingUpload(false);
-      toast.error("University Card ID is Mandatory registered system", {
-        duration: 3000,
-        closeButton: true,
-      });
+
+      if(tipe === 'image'){ // tipe video never be mandatory system ! except image .
+        toast.info("Image was deleted", {
+          duration: 3000,
+          closeButton: true,
+        });
+      }else if(tipe === 'video'){
+        toast.info('Video was deleted')
+      }
+
       return;
     }
 
@@ -120,7 +126,7 @@ const FileInput = ({
       onChange(resultUrl[0].dataUrl); // onchange dari react-hook-form
       setIsLoadingUpload(false); // udahan loadnya
 
-      toast.success("Image was Successfully Upload!", {
+      toast.success("The File was Successfully Upload!", {
         duration: 3000,
         closeButton: true,
       });

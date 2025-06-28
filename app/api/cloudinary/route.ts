@@ -11,7 +11,6 @@ export const POST = async (req:NextRequest) => {
     const formData = await req.formData();
     const file = formData.get('file') as File;
     const folderName = formData.get('folder') as string;
-    console.log(file);
     
     if(!file || file.size === 0){
       throw new Error('file required')

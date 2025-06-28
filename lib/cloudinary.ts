@@ -16,7 +16,6 @@ export async function uploadImages(img:string,imgName:string, folder: string) {
             resource_type: "auto",
             eager: [{width: 600,height:400,fetch_format:"auto",quality:"auto",crop:"fill"}]
         });
-        console.log(res);
         
         return res.eager[0].secure_url;
 }

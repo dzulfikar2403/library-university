@@ -1,3 +1,4 @@
+import { createBook } from '@/action/book'
 import BookForm from '@/components/admin/BookForm'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -12,7 +13,7 @@ const page = () => {
 
         <section className='bg-white p-7 rounded max-w-2xl'>
           {/* boookform */}
-          <BookForm type='create' />
+          <BookForm tipe='create' onSubmit={createBook} />
         </section>
     </div>
   )

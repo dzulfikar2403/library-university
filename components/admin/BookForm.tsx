@@ -17,12 +17,14 @@ import { useForm } from "react-hook-form";
 import { Textarea } from "../ui/textarea";
 import FileInput from "../FileInput";
 import ColorPicker from "../ColorPicker";
+import { toast } from "sonner";
 
 type BookFormProps = {
-  type: "create" | "update";
+  tipe: "create" | "update";
+  onSubmit: (data:TbookSchema) => Promise<{success:boolean,message:string}>
 };
 
-const BookForm = ({ type }: BookFormProps) => {
+const BookForm = ({ tipe, onSubmit }: BookFormProps) => {
   const router = useRouter();
 
   const form = useForm<TbookSchema>({
@@ -42,7 +44,14 @@ const BookForm = ({ type }: BookFormProps) => {
   });
 
   const handleSubmit = async (data: TbookSchema) => {
-    console.log(data);
+    const res = await onSubmit(data);
+
+    if(res.success){
+      toast.success(res.message);
+      router.push('/admin/books')
+    }else{
+      toast.error(res.message);
+    }
   };
 
   return (
@@ -262,7 +271,7 @@ const BookForm = ({ type }: BookFormProps) => {
             )}
           />
           <Button type="submit" className="book-form_btn text-white capitalize">
-            {type} book
+            {tipe} book
           </Button>
         </form>
       </Form>
