@@ -14,7 +14,7 @@ export async function uploadImages(img:string,imgName:string, folder: string) {
             public_id: `${imgName.concat(Date.now().toString())}`,
             folder: `library-university/${getFolder}`,
             resource_type: "auto",
-            eager: [{width: 600,height:400,fetch_format:"auto",quality:"auto",crop:"fill"}]
+            eager: [{width: 600,height:400,fetch_format:"auto",quality:"auto"}]
         });
         
         return res.eager[0].secure_url;
