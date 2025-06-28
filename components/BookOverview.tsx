@@ -7,7 +7,7 @@ const BookOverview = ({ bookHero }: { bookHero: Book }) => {
   return (
     <section className="book-overview">
       <div className="flex flex-1 flex-col gap-5">
-        <h1>{bookHero.title}</h1>
+        <h1 title={bookHero.title}>{bookHero.title}</h1>
 
         <div className="book-info">
           <p>
@@ -50,16 +50,16 @@ const BookOverview = ({ bookHero }: { bookHero: Book }) => {
           <BookCover
             variant={"wide"}
             className={"z-10"}
-            coverColor={bookHero.color}
-            coverUrl={bookHero.cover}
+            coverColor={bookHero.cover_color}
+            coverUrl={bookHero.cover_url}
           />
 
           <div className="hidden md:block absolute top-10 left-16 rotate-12 blur">
             <BookCover
               variant={"wide"}
               className={"z-10"}
-              coverColor={bookHero.color}
-              coverUrl={bookHero.cover}
+              coverColor={bookHero.cover_color}
+              coverUrl={bookHero.cover_url}
             />
           </div>
         </div>

@@ -12,11 +12,11 @@ const BookCard = ({ data }: { data: Book }) => {
         href={`/books/${data.id}`}
         className={cn(data.isLoanedBook && "w-full flex flex-col items-center")}
       >
-        <BookCover coverColor={data.color} coverUrl={data.cover} />
+        <BookCover coverColor={data.cover_color} coverUrl={data.cover_url} />
         <div
           className={cn("mt-4", !data.isLoanedBook && "max-w-28 xs:max-w-40")}
         >
-          <p className="book-title">{data.title}</p>
+          <p className="book-title" title={data.title}>{data.title}</p>
           <p className="book-genre">{data.genre}</p>
         </div>
 
