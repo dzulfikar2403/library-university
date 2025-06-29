@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed-book": "npx tsx --env-file=.env script/seedBook.ts"
   },
   "dependencies": {
     "@auth/pg-adapter": "^1.9.1",
