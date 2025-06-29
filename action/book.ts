@@ -28,7 +28,7 @@ export const createBook = async (data:TbookSchema) => {
         `,[title,author,genre,rating,coverUrl,coverColor,description,totalCopies,availableCopies,checkVideoUrl,summary]);
         
         if(res.rows.length > 0){
-            const dataBook = await pool.query('select * from book order by book desc limit 10');
+            const dataBook = await pool.query('select * from book order by created_at desc limit 10');
             await redis.set('book', dataBook.rows,{xx:true,ex: 3600}); // update using xx:true
         };
 
@@ -44,7 +44,7 @@ export const getBook = async () => {
     const getBook:Book[]|null = await redis.get('book');
     
     if(!getBook){
-        const dataBook = await pool.query('select * from book order by book desc limit 10');
+        const dataBook = await pool.query('select * from book order by created_at desc limit 10');
         await redis.set('book', dataBook.rows,{nx:true,ex: 3600}) // update using nx:true
         
         return {success: true, caching: false, data:dataBook.rows};
