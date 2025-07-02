@@ -2,6 +2,8 @@
 import pool from "@/lib/database/postgresQL/db";
 import redis from "@/lib/database/redis/redis";
 import { TbookSchema } from "@/lib/validations";
+import { redirect } from "next/navigation";
+import { validate as isUUID } from 'uuid'
 
 export const createBook = async (data:TbookSchema) => {
     const {
@@ -45,7 +47,29 @@ export const getBook = async () => {
     
     if(!getBook){
         const dataBook = await pool.query('select * from book order by created_at desc limit 10');
-        await redis.set('book', dataBook.rows,{nx:true,ex: 3600}) // update using nx:true
+        await redis.set('book', dataBook.rows,{nx:true,ex: 3600}) // add using nx:true
+        
+        return {success: true, caching: false, data:dataBook.rows};
+    }
+
+    return {success: true, caching: true, data: getBook};
+}
+
+export const getBookById = async (id:string) => {
+    const getBook:Book[]|null = await redis.get(`book:${id}`);
+    
+    if(!isUUID(id)){ // validate id as uuid 
+        redirect('/404')
+    }
+
+    if(!getBook){
+        const dataBook = await pool.query('select * from book where id = $1 limit 1',[id]);
+        
+        if(dataBook.rows.length === 0){ // if data not exists
+            redirect('/404')
+        }
+
+        await redis.set(`book:${id}`, dataBook.rows,{nx:true,ex: 3600}) // add using nx:true
         
         return {success: true, caching: false, data:dataBook.rows};
     }

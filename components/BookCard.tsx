@@ -9,7 +9,7 @@ const BookCard = ({ data }: { data: Book }) => {
   return (
     <li className={cn(data.isLoanedBook && "w-full xs:max-w-52")}>
       <Link
-        href={`/books/${data.id}`}
+        href={`/book/${data.id}`}
         className={cn(data.isLoanedBook && "w-full flex flex-col items-center")}
       >
         <BookCover coverColor={data.cover_color} coverUrl={data.cover_url} />
