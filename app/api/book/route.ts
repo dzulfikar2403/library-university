@@ -1,8 +1,15 @@
 import { getBook, getBookById } from "@/action/book";
+import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
 import { validate as isUUID } from "uuid";
 
 export const GET = async (req: NextRequest) => {
+  const session = await auth();
+
+  if(!session?.user?.email){
+    return NextResponse.json({ message: `Unauthorized User`, data: null },{ status: 401 });
+  }
+
   const bookIdParams = req.nextUrl.searchParams;
   const bookId = bookIdParams.get("id");
 
