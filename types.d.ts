@@ -17,3 +17,18 @@ type Book = {
     updated_by?: string;
     isLoanedBook?: boolean; 
 }
+
+type User = {
+    id: string;
+    full_name: string;
+    email: string;
+    university_id: number;
+    password: string;
+    university_card: string;
+    status: string;
+    role: string;
+    created_at?: string;
+    created_by?: string;
+    updated_at?: string;
+    updated_by?: string;
+}

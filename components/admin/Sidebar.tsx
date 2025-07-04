@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import React from "react";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { Session } from "next-auth";
+import { signOut } from "next-auth/react"
 
 const Sidebar = ({ session }: { session: Session }) => {
   const pathname = usePathname();
@@ -73,6 +74,14 @@ const Sidebar = ({ session }: { session: Session }) => {
           <p className="font-semibold text-dark-200">{session.user?.name}</p>
           <p className="text-xs text-light-500">{session.user?.email}</p>
         </div>
+        <button onClick={() => signOut()}>
+          <Image
+            src={"/icons/logout.svg"}
+            alt="logout"
+            width={24}
+            height={24}
+          />
+        </button>
       </div>
     </div>
   );
