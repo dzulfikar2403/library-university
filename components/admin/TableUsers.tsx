@@ -25,6 +25,7 @@ import {
 } from "../ui/dropdown-menu";
 import { updateUserRole } from "@/action/user";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const TableUsers = ({ user }: { user: User[] }) => {
   const router = useRouter();
@@ -57,6 +58,17 @@ const TableUsers = ({ user }: { user: User[] }) => {
 
     setFilteringUser(sortUser);
     setSort(!sort);
+  };
+
+  const handleChangeRole = async (role: "admin" | "user", email: string) => {
+    const res = await updateUserRole(role, email);
+
+    if (res.success) {
+      toast.success(res.message);
+    } else {
+      toast.error(res.message);
+    }
+    router.refresh();
   };
 
   useEffect(() => {
@@ -149,27 +161,33 @@ const TableUsers = ({ user }: { user: User[] }) => {
                             <Badge
                               variant={"outline"}
                               className="capitalize cursor-pointer text-rose-400 bg-rose-200"
-                              onClick={async () => {
-                                await updateUserRole("user", el.email);
-                                router.refresh();
-                              }}
+                              onClick={async () =>
+                                await handleChangeRole("user", el.email)
+                              }
                             >
                               User
                             </Badge>
-                            {el.role === 'user' && <DropdownMenuShortcut><Check size={18} /></DropdownMenuShortcut>}
+                            {el.role === "user" && (
+                              <DropdownMenuShortcut>
+                                <Check size={18} />
+                              </DropdownMenuShortcut>
+                            )}
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Badge
                               variant={"outline"}
                               className="capitalize cursor-pointer text-green-400 bg-green-200"
-                              onClick={async () => {
-                                await updateUserRole("admin", el.email);
-                                router.refresh();
-                              }}
+                              onClick={async () =>
+                                await handleChangeRole("admin", el.email)
+                              }
                             >
                               Admin
                             </Badge>
-                            {el.role === 'admin' && <DropdownMenuShortcut><Check size={18} /></DropdownMenuShortcut>}
+                            {el.role === "admin" && (
+                              <DropdownMenuShortcut>
+                                <Check size={18} />
+                              </DropdownMenuShortcut>
+                            )}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
