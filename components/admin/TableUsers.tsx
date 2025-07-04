@@ -2,7 +2,7 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { ArrowUpDown, CircleX, Eye, X } from "lucide-react";
+import { ArrowUpDown, Eye, X } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -13,12 +13,12 @@ import {
 } from "../ui/table";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import Image from "next/image";
+import { Badge } from "../ui/badge";
 
-const TableAccoutReq = ({ user }: { user: User[] }) => {
+const TableUsers = ({ user }: { user: User[] }) => {
   const [filteringUser, setFilteringUser] = useState<[] | User[]>([]);
   const [sort, setSort] = useState<boolean>(true);
-  const [modalApprove, setModalApprove] = useState<boolean>(false);
-  const [modalReject, setModalReject] = useState<boolean>(false);
+  const [modalDelete, setModalDelete] = useState<boolean>(false);
 
   const searchUser = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
@@ -55,9 +55,7 @@ const TableAccoutReq = ({ user }: { user: User[] }) => {
     <>
       <section className="rounded-xl p-7 max-w-3/4 bg-white">
         <div className="flex flex-wrap justify-between gap-2">
-          <h2 className="text-xl font-semibold">
-            Account Registration Requests
-          </h2>
+          <h2 className="text-xl font-semibold">All Users</h2>
           <div className="flex items-end gap-4">
             <Input
               type="text"
@@ -81,8 +79,11 @@ const TableAccoutReq = ({ user }: { user: User[] }) => {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Date joined</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Books Borrowed</TableHead>
                 <TableHead>University ID</TableHead>
                 <TableHead>ID Card</TableHead>
+                <TableHead>Can Borrow Book</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -116,6 +117,24 @@ const TableAccoutReq = ({ user }: { user: User[] }) => {
                         .slice(3)
                         .trim()}
                     </TableCell>
+                    <TableCell>
+                      {el.role === "user" ? (
+                        <Badge
+                          variant={"outline"}
+                          className="text-rose-400 bg-rose-200"
+                        >
+                          User
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant={"outline"}
+                          className="text-green-400 bg-green-200"
+                        >
+                          Admin
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>{el.total_borrowed_book ?? 0}</TableCell>
                     <TableCell>{el.university_id}</TableCell>
                     <TableCell>
                       <a
@@ -127,22 +146,19 @@ const TableAccoutReq = ({ user }: { user: User[] }) => {
                         <p>View ID Card</p>
                       </a>
                     </TableCell>
+                    <TableCell>{el.can_borrow_book}</TableCell>
                     <TableCell>
-                      <div className="flex gap-6 items-center ">
-                        <Button
-                          className="text-green-400 bg-green-200 hover:ring-1 hover:ring-green-400"
-                          variant={"secondary"}
-                          onClick={() => setModalApprove(true)}
-                        >
-                          Approve Account
-                        </Button>
-                        <CircleX
-                          color="red"
-                          size={24}
-                          className="cursor-pointer"
-                          onClick={() => setModalReject(true)}
+                      <Button
+                        variant={"ghost"}
+                        onClick={() => setModalDelete(true)}
+                      >
+                        <Image
+                          src={"/icons/admin/trash.svg"}
+                          alt="trash"
+                          width={22}
+                          height={22}
                         />
-                      </div>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -150,34 +166,30 @@ const TableAccoutReq = ({ user }: { user: User[] }) => {
           </Table>
         </div>
       </section>
-      {modalApprove && (
+      {modalDelete && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="relative bg-white rounded text-center min-w-[25%] max-w-80 space-y-4 p-4">
-                <X size={22} className="absolute top-4 right-4 cursor-pointer" onClick={() => setModalApprove(false)}/>
-                <div className="relative size-24 mx-auto">
-                    <Image src={'/icons/admin/success-modal.svg'} alt="success" fill />
-                </div>
-                <h2 className="font-semibold text-xl">Approve Account Request</h2>
-                <p className="text-slate-400">Approve the student’s account request and grant access. A confirmation email will be sent upon approval.</p>
-                <Button className="bg-green-400 text-white font-semibold w-full py-6 break-words">Approve & Send Confirmation</Button>
+          <div className="relative bg-white rounded text-center min-w-[25%] max-w-80 space-y-4 p-4">
+            <X
+              size={22}
+              className="absolute top-4 right-4 cursor-pointer"
+              onClick={() => setModalDelete(false)}
+            />
+            <div className="relative size-24 mx-auto">
+              <Image src={"/icons/admin/reject-modal.svg"} alt="success" fill />
             </div>
-        </div>
-      )}
-      {modalReject && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="relative bg-white rounded text-center min-w-[25%] max-w-80 space-y-4 p-4">
-                <X size={22} className="absolute top-4 right-4 cursor-pointer" onClick={() => setModalReject(false)}/>
-                <div className="relative size-24 mx-auto">
-                    <Image src={'/icons/admin/reject-modal.svg'} alt="success" fill />
-                </div>
-                <h2 className="font-semibold text-xl">Deny Account Request</h2>
-                <p className="text-slate-400">Denying this request will notify the student they’re not eligible due to unsuccessful ID card verification.</p>
-                <Button className="bg-rose-400 text-white font-semibold w-full py-6 break-words">Deny & Notify Student</Button>
-            </div>
+            <h2 className="font-semibold text-xl">Delete Account Request</h2>
+            <p className="text-slate-400">
+              Denying this request will notify the student they’re not eligible
+              due to unsuccessful ID card verification.
+            </p>
+            <Button className="bg-rose-400 text-white font-semibold w-full py-6 break-words">
+              Confirm Delete
+            </Button>
+          </div>
         </div>
       )}
     </>
   );
 };
 
-export default TableAccoutReq;
+export default TableUsers;

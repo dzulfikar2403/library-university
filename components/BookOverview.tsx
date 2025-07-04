@@ -3,7 +3,7 @@ import React from "react";
 import { Button } from "./ui/button";
 import BookCover from "./BookCover";
 
-const BookOverview = ({ bookHero }: { bookHero: Book }) => {
+const BookOverview = ({ bookHero, canUserBorrow }: { bookHero: Book,canUserBorrow:boolean }) => {
   return (
     <section className="book-overview">
       <div className="flex flex-1 flex-col gap-5">
@@ -39,7 +39,7 @@ const BookOverview = ({ bookHero }: { bookHero: Book }) => {
 
         <p className="book-description">{bookHero.description}</p>
 
-        <Button className="book-overview_btn">
+        <Button className="book-overview_btn" disabled={canUserBorrow ? false : true}>
           <Image src={"/icons/book.svg"} alt="book" width={20} height={20} />
           <p className="font-bebas-neue text-xl">Borrow</p>
         </Button>

@@ -42,7 +42,7 @@ const TableBook = ({book}:{book:Book[]}) => {
         <div className="flex items-end gap-4">
           <Input type="text" onChange={searchBook} placeholder="Search Book" />
           <Button variant={"outline"} className="flex items-center gap-1" onClick={sortingBook}>
-            <p>A-Z</p>
+            <p>Oldest to Recent</p>
             <ArrowUpDown size={18} color="black" />
           </Button>
           <Button className="bg-primary-admin" asChild>

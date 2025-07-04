@@ -1,19 +1,23 @@
 import { getBook } from "@/action/book";
+import { getUserByEmail } from "@/action/user";
+import { auth } from "@/auth";
 import BookList from "@/components/BookList";
 import BookOverview from "@/components/BookOverview";
 
 const Home = async () => {
-  const { data, success } = await getBook();
+  const session = await auth();
+  const { data:book } = await getBook();
+  const { data:user } = await getUserByEmail(session?.user?.email as string);
 
   return (
     <>
-      {data.length > 0 ? (
+      {book.length > 0 ? (
         <>
-          <BookOverview bookHero={data[0]} />
+          <BookOverview bookHero={book[0]} canUserBorrow={user?.[0]?.can_borrow_book ?? false} />
 
           <BookList
             title={"Latest Books"}
-            books={data.slice(1)}
+            books={book.slice(1)}
             containerClassName="mt-20"
           />
         </>

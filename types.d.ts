@@ -27,8 +27,10 @@ type User = {
     university_card: string;
     status: string;
     role: string;
+    can_borrow_book: boolean;
     created_at?: string;
     created_by?: string;
     updated_at?: string;
     updated_by?: string;
+    total_borrowed_book?: number;
 }
