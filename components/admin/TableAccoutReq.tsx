@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "../ui/table";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import Image from "next/image";
+import ModalConfirm from "./ModalConfirm";
 
 const TableAccoutReq = ({ user }: { user: User[] }) => {
   const [filteringUser, setFilteringUser] = useState<[] | User[]>([]);
@@ -151,30 +151,22 @@ const TableAccoutReq = ({ user }: { user: User[] }) => {
         </div>
       </section>
       {modalApprove && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="relative bg-white rounded text-center min-w-[25%] max-w-80 space-y-4 p-4">
-                <X size={22} className="absolute top-4 right-4 cursor-pointer" onClick={() => setModalApprove(false)}/>
-                <div className="relative size-24 mx-auto">
-                    <Image src={'/icons/admin/success-modal.svg'} alt="success" fill />
-                </div>
-                <h2 className="font-semibold text-xl">Approve Account Request</h2>
-                <p className="text-slate-400">Approve the student’s account request and grant access. A confirmation email will be sent upon approval.</p>
-                <Button className="bg-green-400 text-white font-semibold w-full py-6 break-words">Approve & Send Confirmation</Button>
-            </div>
-        </div>
+        <ModalConfirm
+          tipe="green"
+          textHeader="Approve Account Request"
+          textSubmit="Approve & Send Confirmation"
+          onclose={() => setModalApprove(false)}
+          textDescription="Approve the student’s account request and grant access. A confirmation email will be sent upon approval."
+        />
       )}
       {modalReject && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <div className="relative bg-white rounded text-center min-w-[25%] max-w-80 space-y-4 p-4">
-                <X size={22} className="absolute top-4 right-4 cursor-pointer" onClick={() => setModalReject(false)}/>
-                <div className="relative size-24 mx-auto">
-                    <Image src={'/icons/admin/reject-modal.svg'} alt="success" fill />
-                </div>
-                <h2 className="font-semibold text-xl">Deny Account Request</h2>
-                <p className="text-slate-400">Denying this request will notify the student they’re not eligible due to unsuccessful ID card verification.</p>
-                <Button className="bg-rose-400 text-white font-semibold w-full py-6 break-words">Deny & Notify Student</Button>
-            </div>
-        </div>
+        <ModalConfirm
+          tipe="red"
+          textHeader="Deny Account Request"
+          textSubmit="Deny & Notify Student"
+          onclose={() => setModalReject(false)}
+          textDescription="Denying this request will notify the student they’re not eligible due to unsuccessful ID card verification."
+        />
       )}
     </>
   );

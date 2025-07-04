@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
+import ModalConfirm from "./ModalConfirm";
 
 const TableUsers = ({ user }: { user: User[] }) => {
   const [filteringUser, setFilteringUser] = useState<[] | User[]>([]);
@@ -146,7 +147,7 @@ const TableUsers = ({ user }: { user: User[] }) => {
                         <p>View ID Card</p>
                       </a>
                     </TableCell>
-                    <TableCell>{el.can_borrow_book}</TableCell>
+                    <TableCell>{`${el.can_borrow_book}`}</TableCell>
                     <TableCell>
                       <Button
                         variant={"ghost"}
@@ -167,26 +168,13 @@ const TableUsers = ({ user }: { user: User[] }) => {
         </div>
       </section>
       {modalDelete && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <div className="relative bg-white rounded text-center min-w-[25%] max-w-80 space-y-4 p-4">
-            <X
-              size={22}
-              className="absolute top-4 right-4 cursor-pointer"
-              onClick={() => setModalDelete(false)}
-            />
-            <div className="relative size-24 mx-auto">
-              <Image src={"/icons/admin/reject-modal.svg"} alt="success" fill />
-            </div>
-            <h2 className="font-semibold text-xl">Delete Account Request</h2>
-            <p className="text-slate-400">
-              Denying this request will notify the student they’re not eligible
-              due to unsuccessful ID card verification.
-            </p>
-            <Button className="bg-rose-400 text-white font-semibold w-full py-6 break-words">
-              Confirm Delete
-            </Button>
-          </div>
-        </div>
+        <ModalConfirm
+          tipe="red"
+          textHeader="Delete Account Request"
+          textSubmit="Confirm Delete"
+          onclose={() => setModalDelete(false)}
+          textDescription="Delete the student’s account request and grant access. A confirmation email will be sent upon approval."
+        />
       )}
     </>
   );

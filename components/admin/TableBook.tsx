@@ -10,6 +10,7 @@ import BookCover from '../BookCover';
 const TableBook = ({book}:{book:Book[]}) => {
   const [filteringBook, setFilteringBook] = useState<[] | Book[]>([]);
   const [sort, setSort] = useState<boolean>(true);
+  const [modalDelete, setModalDelete] = useState<boolean>(false);
   
   const searchBook = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
