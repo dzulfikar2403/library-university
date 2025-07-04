@@ -2,7 +2,7 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { ArrowUpDown, Eye, X } from "lucide-react";
+import { ArrowUpDown, Check, Eye, X } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -15,8 +15,19 @@ import { Avatar, AvatarFallback } from "../ui/avatar";
 import Image from "next/image";
 import { Badge } from "../ui/badge";
 import ModalConfirm from "./ModalConfirm";
+import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { updateUserRole } from "@/action/user";
+import { useRouter } from "next/navigation";
 
 const TableUsers = ({ user }: { user: User[] }) => {
+  const router = useRouter();
   const [filteringUser, setFilteringUser] = useState<[] | User[]>([]);
   const [sort, setSort] = useState<boolean>(true);
   const [modalDelete, setModalDelete] = useState<boolean>(false);
@@ -119,21 +130,49 @@ const TableUsers = ({ user }: { user: User[] }) => {
                         .trim()}
                     </TableCell>
                     <TableCell>
-                      {el.role === "user" ? (
-                        <Badge
-                          variant={"outline"}
-                          className="text-rose-400 bg-rose-200"
-                        >
-                          User
-                        </Badge>
-                      ) : (
-                        <Badge
-                          variant={"outline"}
-                          className="text-green-400 bg-green-200"
-                        >
-                          Admin
-                        </Badge>
-                      )}
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Badge
+                            variant={"outline"}
+                            className={cn(
+                              "capitalize cursor-pointer",
+                              el.role === "admin"
+                                ? "text-green-400 bg-green-200"
+                                : "text-rose-400 bg-rose-200"
+                            )}
+                          >
+                            {el.role}
+                          </Badge>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem>
+                            <Badge
+                              variant={"outline"}
+                              className="capitalize cursor-pointer text-rose-400 bg-rose-200"
+                              onClick={async () => {
+                                await updateUserRole("user", el.email);
+                                router.refresh();
+                              }}
+                            >
+                              User
+                            </Badge>
+                            {el.role === 'user' && <DropdownMenuShortcut><Check size={18} /></DropdownMenuShortcut>}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Badge
+                              variant={"outline"}
+                              className="capitalize cursor-pointer text-green-400 bg-green-200"
+                              onClick={async () => {
+                                await updateUserRole("admin", el.email);
+                                router.refresh();
+                              }}
+                            >
+                              Admin
+                            </Badge>
+                            {el.role === 'admin' && <DropdownMenuShortcut><Check size={18} /></DropdownMenuShortcut>}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                     <TableCell>{el.total_borrowed_book ?? 0}</TableCell>
                     <TableCell>{el.university_id}</TableCell>
