@@ -2,7 +2,7 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { ArrowUpDown, Check, Eye, X } from "lucide-react";
+import { ArrowUpDown, Check, Eye} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -23,7 +23,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { updateUserRole } from "@/action/user";
+import { deleteUser, updateUserRole } from "@/action/user";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -32,6 +32,7 @@ const TableUsers = ({ user }: { user: User[] }) => {
   const [filteringUser, setFilteringUser] = useState<[] | User[]>([]);
   const [sort, setSort] = useState<boolean>(true);
   const [modalDelete, setModalDelete] = useState<boolean>(false);
+  const [selectedEmail, setSelectedEmail] = useState<null | string>(null);
 
   const searchUser = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
@@ -70,6 +71,21 @@ const TableUsers = ({ user }: { user: User[] }) => {
     }
     router.refresh();
   };
+
+  const handleDeleteUser = async (email:string) => {
+    const res = await deleteUser(email);
+
+    if(res.success){
+      toast.success(res.message,{
+        description: `deleted user ${email}`
+      });
+    }else{
+      toast.error(res.message,{
+        description: `failed delete user`
+      });  
+    }
+    router.refresh();
+  }
 
   useEffect(() => {
     setFilteringUser(user);
@@ -208,14 +224,17 @@ const TableUsers = ({ user }: { user: User[] }) => {
                     <TableCell>
                       <Button
                         variant={"ghost"}
-                        onClick={() => setModalDelete(true)}
-                      >
+                        onClick={() => {
+                          setModalDelete(true)
+                          setSelectedEmail(el.email)
+                        }}
+                        >
                         <Image
                           src={"/icons/admin/trash.svg"}
                           alt="trash"
                           width={22}
                           height={22}
-                        />
+                          />
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -229,7 +248,11 @@ const TableUsers = ({ user }: { user: User[] }) => {
           tipe="red"
           textHeader="Delete Account Request"
           textSubmit="Confirm Delete"
-          onclose={() => setModalDelete(false)}
+          onclose={() => {
+            setModalDelete(false)
+            setSelectedEmail(null)
+          }}
+          onclick={() => handleDeleteUser(selectedEmail as string ?? '')}
           textDescription="Delete the student’s account request and grant access. A confirmation email will be sent upon approval."
         />
       )}

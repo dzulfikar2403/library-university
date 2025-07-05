@@ -1,116 +1,209 @@
-'use server'
+"use server";
 
 import pool from "@/lib/database/postgresQL/db";
 import ratelimit from "@/lib/database/redis/ratelimit";
-import redis from "@/lib/database/redis/redis";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+// users
 export const getAllUser = async () => {
     try {
-        const getUser:User[]|null = await redis.get('user');
+        const res = await pool.query(`select u.id,
+                                            u.full_name ,
+                                            u.email ,
+                                            u.created_at,
+                                            u.updated_at,
+                                            u.role,
+                                            u.university_id ,
+                                            u.university_card ,
+                                            u.status ,
+                                            u.can_borrow_book,
+                                            count(bb.book_id) total_borrowed_book
+                                    from users u 
+                                    left join borrow_book bb on (u.id = bb.user_id)
+                                    where u.status = 'success'
+                                    group by u.id,u.email
+                                    order by u.created_at desc`);
 
-        if(!getUser){
-            const res = await pool.query(`select u.id,
-                                                u.full_name ,
-                                                u.email ,
-                                                u.created_at,
-                                                u.updated_at,
-                                                u.role,
-                                                u.university_id ,
-                                                u.university_card ,
-                                                u.status ,
-                                                u.can_borrow_book,
-                                                count(bb.book_id) total_borrowed_book
-                                        from users u 
-                                        left join borrow_book bb on (u.id = bb.user_id)
-                                        where u.status = 'success'
-                                        group by u.id,u.email
-                                        order by u.created_at desc`);
-            await redis.set('user',res.rows);
-
-            return {success: true,message: 'sucessfully get all user',caching:false,data: res.rows}
-        }
-
-        return {success: true,message: 'sucessfully get all user',caching:true,data: getUser}
+        return {
+            success: true,
+            message: "sucessfully get all user",
+            data: res.rows,
+        };
     } catch (error) {
         console.log(`error : ${error}`);
-        
-        return {success: false,message: 'get user status pending error',caching:false,data: null}
+
+        return {
+            success: false,
+            message: "get user status pending error",
+            data: null,
+        };
     }
-}
+};
 
-export const getUserByEmail = async (email:string) => {
-    const ip = (await headers()).get('x-forwarded-for') ?? '127.0.0.1';
+export const getUserByEmail = async (email: string) => {
+    const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1";
 
-    const {success} = await ratelimit.limit(ip);
+    const { success } = await ratelimit.limit(ip);
 
-    if(!success) redirect('/too-many-request');
+    if (!success) redirect("/too-many-request");
 
-    try { 
-        const res = await pool.query(`select *
-                                    from users u 
-                                    where status = 'success' and email ilike $1
-                                    limit 1`,[email]);
-        
-        return {success: false,message: 'successfully get user by email',data: res.rows}
+    try {
+        const res = await pool.query(
+            `select *
+            from users u 
+            where status = 'success' and email ilike $1
+            limit 1`,
+            [email]
+        );
+
+        return {
+            success: false,
+            message: "successfully get user by email",
+            data: res.rows,
+        };
     } catch (error) {
-        return {success: false,message: 'get user by email error',data: null}
+        return { success: false, message: "get user by email error", data: null };
     }
-}
+};
 
+export const updateUserRole = async (role: "user" | "admin", email: string) => {
+    if (!role || !email) {
+        return {
+            success: false,
+            message: "update user role successfully",
+            data: null,
+        };
+    }
+
+    try {
+        await pool.query(
+            `update users
+        set "role" = $1
+        where email = $2
+        returning *`,
+            [role, email]
+        );
+
+        return {
+            success: true,
+            message: "update user role successfully",
+            data: null,
+        };
+    } catch (error) {
+        console.log(error);
+
+        return { success: false, message: "update user role error", data: null };
+    }
+};
+
+export const deleteUser = async (email: string) => {
+    if (!email) {
+        return { success: false, message: "email required", data: null };
+    }
+
+    try {
+        await pool.query(
+            `delete from users
+            where email = $1
+            returning *`,
+            [email]
+        );
+
+        return { success: true, message: "successfully delete", data: null };
+    } catch (error) {
+        console.log(error);
+
+        return { success: false, message: "delete user error", data: null };
+    }
+};
+
+// account req
 export const getUserPending = async () => {
     try {
-        const getUser:User[]|null = await redis.get('user:pending');
+        const res = await pool.query(`
+        select *
+        from users u 
+        where status = 'pending'
+        order by created_at desc`);
 
-        if(!getUser){
-            const res = await pool.query(`select *
-                from users u 
-                where status = 'pending'
-                order by created_at desc`);
-            await redis.set('user:pending',res.rows)
-
-            return {success: true,message: 'sucessfully get user pending',caching:false,data: res.rows}
-        }
-
-        return {success: true,message: 'sucessfully get user pending',caching:true,data: getUser}
+        return {
+            success: true,
+            message: "sucessfully get user pending",
+            data: res.rows,
+        };
     } catch (error) {
         console.log(`error : ${error}`);
-        
-        return {success: false,message: 'get user status pending error',caching:false,data: null}
+
+        return {
+            success: false,
+            message: "get user status pending error",
+            data: null,
+        };
     }
-}
+};
 
-export const updateUserRole = async(role:'user'|'admin',email:string) => {
+export const approveAccount = async (email: string) => {
+    if (!email) {
+        return {
+            success: false,
+            message: `email required`,
+            data: null,
+        };
+    }
+
     try {
-        const updateRoleQuery = await pool.query(`update users
-                                        set "role" = $1
-                                        where email = $2
-                                        returning *`,[role,email])
-        
-        if(updateRoleQuery.rows.length > 0){
-            const revalidateUser = await pool.query(`select u.id,
-                                                        u.full_name ,
-                                                        u.email ,
-                                                        u.created_at,
-                                                        u.updated_at,
-                                                        u.role,
-                                                        u.university_id ,
-                                                        u.university_card ,
-                                                        u.status ,
-                                                        u.can_borrow_book,
-                                                        count(bb.book_id) total_borrowed_book
-                                                    from users u 
-                                                    left join borrow_book bb on (u.id = bb.user_id)
-                                                    where u.status = 'success'
-                                                    group by u.id,u.email
-                                                    order by u.created_at desc`);
-        await redis.set('user',revalidateUser.rows,{xx:true}); // overide key user
-        }
+        await pool.query(
+            `update users
+            set status = 'success'
+            where email = $1
+            returning *`,
+            [email]
+        );
 
-        return {success: true,message: 'update user role successfully',data: null}
+        return {
+            success: true,
+            message: `succesfully aprrove user`,
+            data: null,
+        };
     } catch (error) {
-        
-        return {success: false,message: 'update user role error',data: null}
+        console.log(`error : ${error}`);
+
+        return {
+            success: false,
+            message: "approve user error",
+            data: null,
+        };
+    }
+};
+
+export const rejectAccount = async (email: string) => {
+    if (!email) {
+        return {
+            success: false,
+            message: "email required",
+            data: null,
+        };
+    }
+
+    try {
+        await pool.query(
+            `update users
+                set status = 'rejected'
+                where email = $1`,[email]);
+
+        return {
+            success: true,
+            message: "succesfully reject user",
+            data: null,
+        };
+    } catch (error) {
+        console.log(`error : ${error}`);
+
+        return {
+            success: false,
+            message: "reject user error",
+            data: null,
+        };
     }
 }

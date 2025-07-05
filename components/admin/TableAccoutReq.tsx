@@ -13,12 +13,17 @@ import {
 } from "../ui/table";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import ModalConfirm from "./ModalConfirm";
+import { approveAccount, rejectAccount } from "@/action/user";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const TableAccoutReq = ({ user }: { user: User[] }) => {
+  const router = useRouter();
   const [filteringUser, setFilteringUser] = useState<[] | User[]>([]);
   const [sort, setSort] = useState<boolean>(true);
   const [modalApprove, setModalApprove] = useState<boolean>(false);
   const [modalReject, setModalReject] = useState<boolean>(false);
+  const [selectedEmail, setSelectedEmail] = useState<null | string>(null);
 
   const searchUser = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.toLowerCase();
@@ -47,10 +52,41 @@ const TableAccoutReq = ({ user }: { user: User[] }) => {
     setSort(!sort);
   };
 
+  
+  const handleApproveUser = async (email:string) => {
+    const res = await approveAccount(email);
+
+    if(res.success){
+      toast.success(res.message,{
+        description: `approved user ${email}`
+      });
+    }else{
+      toast.error(res.message,{
+        description: `failed approve user`
+      });  
+    }
+    router.refresh();
+  }
+
+  const handleRejectUser = async (email:string) => {
+    const res = await rejectAccount(email);
+
+    if(res.success){
+      toast.success(res.message,{
+        description: `approved user ${email}`
+      });
+    }else{
+      toast.error(res.message,{
+        description: `failed approve user`
+      });  
+    }
+    router.refresh();
+  }
+
   useEffect(() => {
     setFilteringUser(user);
   }, [user]);
-
+  
   return (
     <>
       <section className="rounded-xl p-7 max-w-3/4 bg-white">
@@ -132,7 +168,10 @@ const TableAccoutReq = ({ user }: { user: User[] }) => {
                         <Button
                           className="text-green-400 bg-green-200 hover:ring-1 hover:ring-green-400"
                           variant={"secondary"}
-                          onClick={() => setModalApprove(true)}
+                          onClick={() => {
+                            setModalApprove(true)
+                            setSelectedEmail(el.email)
+                          }}
                         >
                           Approve Account
                         </Button>
@@ -140,7 +179,10 @@ const TableAccoutReq = ({ user }: { user: User[] }) => {
                           color="red"
                           size={24}
                           className="cursor-pointer"
-                          onClick={() => setModalReject(true)}
+                          onClick={() => {
+                            setModalReject(true)
+                            setSelectedEmail(el.email)
+                          }}
                         />
                       </div>
                     </TableCell>
@@ -155,16 +197,24 @@ const TableAccoutReq = ({ user }: { user: User[] }) => {
           tipe="green"
           textHeader="Approve Account Request"
           textSubmit="Approve & Send Confirmation"
-          onclose={() => setModalApprove(false)}
+          onclose={() => {
+            setModalApprove(false)
+            setSelectedEmail(null)
+          }}
+          onclick={() => handleApproveUser(selectedEmail as string ?? '')}
           textDescription="Approve the student’s account request and grant access. A confirmation email will be sent upon approval."
-        />
-      )}
+          />
+        )}
       {modalReject && (
         <ModalConfirm
           tipe="red"
           textHeader="Deny Account Request"
           textSubmit="Deny & Notify Student"
-          onclose={() => setModalReject(false)}
+          onclose={() => {
+            setModalReject(false)
+            setSelectedEmail(null)
+          }}
+          onclick={() => handleRejectUser(selectedEmail as string ?? '')}
           textDescription="Denying this request will notify the student they’re not eligible due to unsuccessful ID card verification."
         />
       )}

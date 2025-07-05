@@ -9,10 +9,11 @@ type ModalConfirmProps = {
     textHeader: string
     textSubmit: string
     textDescription: string
-    onclose: VoidFunction
+    onclose: () => void
+    onclick: () => Promise<void>
 }
 
-const ModalConfirm = ({tipe,onclose,textSubmit,textHeader,textDescription}:ModalConfirmProps) => {
+const ModalConfirm = ({tipe,onclose,textSubmit,textHeader,textDescription,onclick}:ModalConfirmProps) => {
   return (
     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
       <div className="relative bg-white rounded text-center min-w-[25%] max-w-80 space-y-4 p-4">
@@ -28,7 +29,7 @@ const ModalConfirm = ({tipe,onclose,textSubmit,textHeader,textDescription}:Modal
         <p className="text-slate-400">
           {textDescription}
         </p>
-        <Button className={cn('text-white font-semibold w-full py-6 break-words',
+        <Button onClick={onclick} className={cn('text-white font-semibold w-full py-6 break-words',
             tipe === 'green' ? 'bg-green-400'  : 'bg-rose-400' 
         )}>
           {textSubmit}
