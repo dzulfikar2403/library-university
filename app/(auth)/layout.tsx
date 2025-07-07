@@ -1,14 +1,8 @@
-import { auth } from "@/auth";
+
 import Image from "next/image";
-import { redirect } from "next/navigation";
 import React, { ReactNode } from "react";
 
 const layout = async ({ children }: { children: ReactNode }) => {
-  const session = await auth();
-
-  if(session){
-    redirect('/')
-  }
 
   return (
     <main className="auth-container">

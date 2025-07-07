@@ -21,7 +21,18 @@ export const loginCredentials = async (data:TSignInSchema) => {
         redirect('/too-many-request')
     }
 
+    if(!data.email || !data.password){
+        return {success: false, message: 'input required'} 
+    }
+    
+    
     try {
+        const userByEmail = await pool.query('select * from users where email ilike $1',[data.email]);
+        
+        if(!userByEmail?.rows[0]?.email || userByEmail.rowCount === 0 || userByEmail.rows.length === 0){
+            return {success: false, message: 'email is not exists'} 
+        }
+
         await signIn('credentials',{
             redirect: false,
             ...data

@@ -1,9 +1,6 @@
 "use server";
 
 import pool from "@/lib/database/postgresQL/db";
-import ratelimit from "@/lib/database/redis/ratelimit";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 
 // users
 export const getAllUser = async () => {
@@ -42,12 +39,6 @@ export const getAllUser = async () => {
 };
 
 export const getUserByEmail = async (email: string) => {
-    const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1";
-
-    const { success } = await ratelimit.limit(ip);
-
-    if (!success) redirect("/too-many-request");
-
     try {
         const res = await pool.query(
             `select *
@@ -58,7 +49,7 @@ export const getUserByEmail = async (email: string) => {
         );
 
         return {
-            success: false,
+            success: true,
             message: "successfully get user by email",
             data: res.rows,
         };
