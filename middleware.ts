@@ -1,17 +1,21 @@
-import { auth } from "@/auth";
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "./lib/utils";
 
 export async function middleware(req:NextRequest){
-    const session = await auth();
+    const session = await getSession();
+    
+    const currentPath = req.nextUrl.pathname;
     const isAuthProtect = ['/sign-in','/sign-up'];
-
-    // cek kalo diluar auth route dan gada sesion email, tendang.
-    if(!isAuthProtect.includes(req.nextUrl.pathname) && !session?.user?.email) { 
-        return NextResponse.redirect(new URL('/sign-in',req.url));
-    };
+    const isAdminProtect = ['/admin'];
+    const userEmail = session?.user?.email;
+    
+    // cek kalo lagi diluar auth route dan ngk ada email , tendang.
+    if(!isAuthProtect.includes(currentPath) && !userEmail){
+        return NextResponse.redirect(new URL("/sign-in", req.url));
+    }
     
     // cek kalo didalam auth route dan ada sesion email, tendang ke home (karna dh login).
-    if(isAuthProtect.includes(req.nextUrl.pathname) && session?.user?.email) {
+    if(isAuthProtect.includes(currentPath) && userEmail) {
         return NextResponse.redirect(new URL('/',req.url));
     };
     
@@ -20,9 +24,7 @@ export async function middleware(req:NextRequest){
 
 export const config = {
     matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
+    // Skip Next.js internals and all static files and api route, unless found in search params
+    '/((?!_next|api|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
   ],
 }

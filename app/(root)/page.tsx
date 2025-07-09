@@ -1,11 +1,11 @@
 import { getBook } from "@/action/book";
 import { getUserByEmail } from "@/action/user";
-import { auth } from "@/auth";
 import BookList from "@/components/BookList";
 import BookOverview from "@/components/BookOverview";
+import { getSession } from "@/lib/utils";
 
 const Home = async () => {
-  const session = await auth();
+  const session = await getSession();
   const { data:book } = await getBook();
   const { data:user } = await getUserByEmail(session?.user?.email as string);
 

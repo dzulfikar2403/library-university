@@ -12,7 +12,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth(() => {
         adapter: PostgresAdapter(pool),
         
         session: {
-            strategy: 'jwt'
+            strategy: 'jwt',
+            maxAge: 1 * 60 * 60, // exp: 1jam
         },
         
         providers: [

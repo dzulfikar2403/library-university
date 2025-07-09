@@ -1,14 +1,14 @@
-import { auth } from "@/auth";
 import { ReactNode } from "react";
 import '@/styles/admin.css'
 import Sidebar from "@/components/admin/Sidebar";
 import Header from "@/components/admin/Header";
 import { Session } from "next-auth";
+import { getSession } from "@/lib/utils";
 
 
 const layout = async ({ children }: { children: ReactNode }) => {
-  const session = await auth();
-
+  const session = await getSession();
+  
   // if(session.user.role !== 'admin') redirect('/');
 
   return (
