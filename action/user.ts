@@ -198,3 +198,66 @@ export const rejectAccount = async (email: string) => {
         };
     }
 }
+
+
+// borrow req
+export const getListBorrowRequest = async (limit:number = 10,offset:number = 0) => {
+    try {
+        const res = await pool.query(`select u.id as user_id,
+                                                u.full_name,
+                                                u.email,
+                                                u.can_borrow_book,
+                                                u.created_at as user_created,
+                                                b.id as book_id,
+                                                b.title as book_title,
+                                                b.cover_url,
+                                                b.cover_color,
+                                                b.created_at as book_created,
+                                                bb.id as borrow_id,
+                                                bb.borrow_date,
+                                                bb.due_date,
+                                                bb.return_date,
+                                                bb.status_borrow
+                                        from users u 
+                                        left join borrow_book bb on (u.id = bb.user_id )
+                                        inner join book b on (bb.book_id = b.id )
+                                        where u.status = 'success'
+                                        order by bb.borrow_date desc
+                                        limit $1 offset $2;
+                                        `,[limit,offset]);
+
+
+        return {success: true, message: 'succesfully get data borrow', data: res.rows};
+    } catch (error) {
+        console.log(`error : ` + error);
+        
+        return {success: false, message: 'get data borrow error', data: null};
+    }
+}
+
+export const updateStatusBorrowReq = async (tipe: 'borrowed' | 'returned',borrowId:string) => {
+    if(!tipe || !borrowId){
+        return {success: false, message: 'tipe and borrow-id is required', data: null};
+    }
+
+    try {
+        const res = tipe === 'borrowed' ? await pool.query(
+                                                `update borrow_book bb 
+                                                set status_borrow = $1,
+                                                    return_date = null
+                                                where bb.id = $2
+                                                returning *`,[tipe,borrowId])
+                                        : await pool.query(
+                                                `update borrow_book bb 
+                                                set status_borrow = $1,
+                                                    return_date = now()
+                                                where bb.id = $2
+                                                returning *`,[tipe,borrowId]);
+        
+        return {success: true, message: 'successfully update status borrow', data: res.rows};
+    } catch (error) {
+        console.log(`error : ` + error);
+        
+        return {success: false, message: 'update data borrow error', data: null};
+    }
+}

@@ -34,3 +34,21 @@ type User = {
     updated_by?: string;
     total_borrowed_book?: number;
 }
+
+type BorrowReq = {
+    user_id: string,
+    full_name: string,
+    email: string,
+    can_borrow_book: boolean,
+    user_created: string,
+    book_id: string,
+    book_title: string,
+    cover_url: string,
+    cover_color: string,
+    book_created: string,
+    borrow_id: string,
+    borrow_date: string,
+    due_date: string,
+    return_date: string | null,
+    status_borrow: 'borrowed' | 'returned'
+}
